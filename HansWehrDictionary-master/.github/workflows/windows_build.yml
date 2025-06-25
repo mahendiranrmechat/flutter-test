@@ -13,13 +13,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          path: 'flutter-test'  # This matches your repository name
 
       - name: Verify project structure
         run: |
+          echo "=== Repository Contents ==="
           ls -la
-          ls -la HansWehrDictionary-master/
-          ls -la HansWehrDictionary-master/pubspec.yaml
-          echo "Project verification complete"
+          echo "=== Project Directory Contents ==="
+          ls -la flutter-test/HansWehrDictionary-master/
+          echo "=== Checking for pubspec.yaml ==="
+          if [ -f "flutter-test/HansWehrDictionary-master/pubspec.yaml" ]; then
+            echo "pubspec.yaml found!"
+          else
+            echo "ERROR: pubspec.yaml not found!"
+            exit 1
+          fi
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -31,15 +40,15 @@ jobs:
         run: flutter config --enable-windows-desktop
 
       - name: Install dependencies
-        working-directory: HansWehrDictionary-master
+        working-directory: flutter-test/HansWehrDictionary-master
         run: flutter pub get
 
       - name: Build Windows EXE
-        working-directory: HansWehrDictionary-master
+        working-directory: flutter-test/HansWehrDictionary-master
         run: flutter build windows --release
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-windows-exe
-          path: HansWehrDictionary-master/build/windows/runner/Release/*.exe
+          path: flutter-test/HansWehrDictionary-master/build/windows/runner/Release/*.exe
