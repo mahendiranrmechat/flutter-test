@@ -9,26 +9,29 @@ jobs:
   build:
     name: Build EXE
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          path: 'repo'  # Simple root directory name
+          path: 'flutter-test'  # Matches your repository root
 
       - name: Debug directory structure
         run: |
-          echo "=== Root Contents ==="
+          echo "=== GITHUB_WORKSPACE: $GITHUB_WORKSPACE ==="
+          echo "=== Repository contents ==="
           ls -la
-          echo "=== Project Contents ==="
-          ls -la repo/HansWehrDictionary-master/
-          echo "=== Verify pubspec.yaml ==="
-          if [ -f "repo/HansWehrDictionary-master/pubspec.yaml" ]; then
-            echo "pubspec.yaml found!"
-          else
-            echo "ERROR: pubspec.yaml missing!"
-            exit 1
-          fi
+          echo "=== Project contents ==="
+          ls -la flutter-test/HansWehrDictionary-master/
+          echo "=== Critical files check ==="
+          ls -la flutter-test/HansWehrDictionary-master/pubspec.yaml
+          ls -la flutter-test/HansWehrDictionary-master/lib/
+          echo "=== Path verification ==="
+          cd flutter-test/HansWehrDictionary-master
+          echo "Final working directory: $(pwd)"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -40,17 +43,18 @@ jobs:
         run: flutter config --enable-windows-desktop
 
       - name: Install dependencies
-        working-directory: ${{ github.workspace }}/repo/HansWehrDictionary-master
+        working-directory: flutter-test/HansWehrDictionary-master
         run: |
-          echo "Current path: $PWD"
+          echo "Final verification - current directory:"
+          pwd
           flutter pub get
 
       - name: Build Windows EXE
-        working-directory: ${{ github.workspace }}/repo/HansWehrDictionary-master
+        working-directory: flutter-test/HansWehrDictionary-master
         run: flutter build windows --release
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: hans-wehr-app
-          path: ${{ github.workspace }}/repo/HansWehrDictionary-master/build/windows/runner/Release/*.exe
+          path: flutter-test/HansWehrDictionary-master/build/windows/runner/Release/*.exe
