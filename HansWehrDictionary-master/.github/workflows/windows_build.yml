@@ -2,8 +2,8 @@ name: Build Flutter Windows EXE
 
 on:
   push:
-    branches: [ main, master ] # Trigger on push to main/master
-  workflow_dispatch: # Manual trigger option
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,28 +13,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          path: 'HansWehrDictionary' # This ensures consistent directory naming
+
+      - name: Verify project structure
+        run: |
+          ls -la
+          ls -la HansWehrDictionary-master/
+          ls -la HansWehrDictionary-master/pubspec.yaml
+          echo "Project verification complete"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.2'
-          channel: 'stable' # Explicitly specify channel
+          channel: 'stable'
 
       - name: Enable Windows desktop
         run: flutter config --enable-windows-desktop
 
       - name: Install dependencies
-        working-directory: HansWehrDictionary
+        working-directory: HansWehrDictionary-master
         run: flutter pub get
 
       - name: Build Windows EXE
-        working-directory: HansWehrDictionary
+        working-directory: HansWehrDictionary-master
         run: flutter build windows --release
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-windows-exe
-          path: HansWehrDictionary/build/windows/runner/Release/*.exe
+          path: HansWehrDictionary-master/build/windows/runner/Release/*.exe
