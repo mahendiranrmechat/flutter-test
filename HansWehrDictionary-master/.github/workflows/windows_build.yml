@@ -2,8 +2,8 @@ name: Build Flutter Windows EXE
 
 on:
   push:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches: [ main, master ] # Trigger on push to main/master
+  workflow_dispatch: # Manual trigger option
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2'
+          flutter-version: '3.22.2' # Use your version
 
       - name: Enable Windows desktop
         working-directory: HansWehrDictionary-master
