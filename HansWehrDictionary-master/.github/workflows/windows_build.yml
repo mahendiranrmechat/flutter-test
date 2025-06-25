@@ -13,26 +13,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          path: 'HansWehrDictionary' # This ensures consistent directory naming
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2' # Use your version
+          flutter-version: '3.22.2'
+          channel: 'stable' # Explicitly specify channel
 
       - name: Enable Windows desktop
-        working-directory: HansWehrDictionary-master
         run: flutter config --enable-windows-desktop
 
       - name: Install dependencies
-        working-directory: HansWehrDictionary-master
+        working-directory: HansWehrDictionary
         run: flutter pub get
 
       - name: Build Windows EXE
-        working-directory: HansWehrDictionary-master
-        run: flutter build windows
+        working-directory: HansWehrDictionary
+        run: flutter build windows --release
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-windows-exe
-          path: HansWehrDictionary-master/build/windows/runner/Release/*.exe
+          path: HansWehrDictionary/build/windows/runner/Release/*.exe
